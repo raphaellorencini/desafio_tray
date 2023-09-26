@@ -1,0 +1,50 @@
+version: '3'
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  tray_app:
+    build: .docker/php
+    container_name: tray_app
+    #entrypoint: dockerize -wait tcp://tray_db:3306 -timeout 40s ./.docker/entrypoint.sh
+    entrypoint: dockerize -wait tcp://tray_db:3306 -timeout 40s /tmp/entrypoint.sh
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=tray_db
+      - DB_PORT=3306
+      - DB_DATABASE=tray_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    volumes:
+      - .:/var/www
+    networks:
+      - app_network
+    depends_on:
+      - tray_db
+
+  tray_db:
+    image: mysql:8.0
+    container_name: tray_db
+    restart: always
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=tray_db
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - app_network
+
+#  tray_redis:
+#    image: redis:alpine
+#    container_name: tray_redis
+#    expose:
+#      - 6379
+#    networks:
+#      - app_network
+
