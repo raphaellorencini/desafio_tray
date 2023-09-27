@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
 {
-    public function store()
+    public function login()
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $user = User::find(Auth::user()->id);
@@ -22,10 +22,24 @@ class AuthenticationController extends Controller
             }
         }
 
-        // failure to authenticate
         return response()->json([
             'success' => false,
-            'message' => 'Failed to authenticate.',
+            'message' => 'Unauthorized',
+        ], 401);
+    }
+
+    public function logout(Request $request)
+    {
+        if (Auth::user()) {
+            $request->user()->token()->revoke();
+            return response()->json([
+                'success' => true,
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
         ], 401);
     }
 }
