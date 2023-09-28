@@ -41,7 +41,7 @@ trait UserControllerTrait
         $user->save();
         $user->roles()->attach($role);
 
-        return response()->json($user);
+        return response()->json($user, 201);
     }
 
     public function show(string $id)
@@ -98,6 +98,6 @@ trait UserControllerTrait
         $this->users->delete($id);
         return response()->json([
             'message' => 'deleted'
-        ]);
+        ], 204);
     }
 }

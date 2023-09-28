@@ -28,6 +28,7 @@ class UserRepository extends BaseRepository
             unset($value->roles);
             return $value;
         })->toArray();
+
         return $userList;
     }
 

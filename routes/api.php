@@ -33,6 +33,7 @@ Route::group(['namespace' => 'Api', 'prefix' => 'v1'], function () {
         Route::delete('sellers/{id}', [SellersController::class, 'destroy']);
 
         Route::get('sales', [SalesController::class, 'index']);
+        Route::post('sales', [SalesController::class, 'store']);
 
 
     });
