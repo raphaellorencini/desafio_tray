@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\IndexController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,7 +15,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+    return view('pages.login');
 });
+Route::get('/dashboard', [IndexController::class, 'dashboard'])->name('dashboard');
+Route::get('/users', [IndexController::class, 'users'])->name('users');
+Route::get('/sellers', [IndexController::class, 'sellers'])->name('sellers');
+Route::get('/sales', [IndexController::class, 'sales'])->name('sales');
+Route::post('/redirect', [IndexController::class, 'redirect'])->name('redirect');
+
+Route::get('/logout', [IndexController::class, 'logout'])->name('logout');
 
 require __DIR__.'/auth.php';

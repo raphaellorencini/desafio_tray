@@ -2,8 +2,9 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
+use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 class SaleRepository extends BaseRepository
 {
@@ -11,50 +12,42 @@ class SaleRepository extends BaseRepository
         $this->setModel('Sale');
     }
 
-    public function listQuery($sellerId = null)
+    public function list($sellerId = null, $date = null, $simplePaginate = false, $paginateLimit = 15)
     {
-        return $this->getModel()::when(filled($sellerId) && is_numeric($sellerId), function( Builder $query) use ($sellerId) {
-            $query->whereHas('users', function(Builder $query) use ($sellerId) {
-                $query
-                    ->withTrashed()
-                    ->where('user_id', $sellerId);
+        $data = [];
+        $query = DB::table('sales as s')
+            ->selectRaw('s.*, u.id as user_id, u.name as user_name, u.email as user_email, ROUND(s.value * 0.085, 2) as commission')
+            ->leftJoin('users_sales as us', 'us.sale_id', '=', 's.id')
+            ->leftJoin('users as u', 'u.id', '=', 'us.user_id')
+            ->when(filled($sellerId) && is_numeric($sellerId), function (Builder $query) use ($sellerId) {
+                $query->where('u.id', $sellerId);
+            })
+            ->when(filled($date), function (Builder $query) use ($date) {
+                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+                $query->whereBetween('s.created_at', ["{$dt} 00:00:00", "{$dt} 23:59:59"]);
             });
-        });
+
+        if ($simplePaginate) {
+            $data = $query->paginate($paginateLimit);
+        } else {
+            $data['data'] = $query->get();
+        }
+        return $data;
     }
 
-    public function comissionList($sellerId = null): array
+    public function commission($sellerId = null, $date = null)
     {
-        $sales = $this->listQuery($sellerId)->get();
-        $salesList = [];
-        $salesList['data'] = $sales->toArray();
-        $salesList['data'] = Arr::map($salesList['data'], function($value) {
-            $value['commission'] = floatval($value['commission']);
-            return $value;
-        });
-
-        $salesList['total_commission'] = floatval(sprintf('%.2f', collect($salesList['data'])->sum('commission')));
-
-        return $salesList;
-    }
-
-    public function paginate($sellerId = null)
-    {
-        $user = $sellerId ? $this->user->getById($sellerId, true) : null;
-        $limit = $this->paginationLimit();
-        $sales = $this->listQuery($sellerId)
-            ->simplePaginate($limit);
-
-        $salesList = $sales->toArray();
-        $salesList['data'] = collect($sales->items())->map(function($value) use ($user) {
-            $value->user = $user ?? $value->users->toArray()[0];
-            unset($value->users);
-            return $value;
-        })->toArray();
-        $salesList['data'] = Arr::map($salesList['data'], function($value) {
-            $value['commission'] = floatval($value['commission']);
-            return $value;
-        });
-
-        return $salesList;
+        return DB::table('sales as s')
+            ->selectRaw('SUM(ROUND(s.value * 0.085, 2)) as commission')
+            ->when(filled($sellerId) && is_numeric($sellerId), function (Builder $query) use ($sellerId) {
+                $query->leftJoin('users_sales as us', 'us.sale_id', '=', 's.id')
+                    ->leftJoin('users as u', 'u.id', '=', 'us.user_id')
+                    ->where('u.id', $sellerId);
+            })
+            ->when(filled($date), function (Builder $query) use ($date) {
+                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+                $query->whereBetween('s.created_at', ["{$dt} 00:00:00", "{$dt} 23:59:59"]);
+            })
+        ->first()?->commission ?? 0;
     }
 }

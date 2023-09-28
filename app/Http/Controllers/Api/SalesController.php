@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ComissionSendMail;
 use App\Repositories\SaleRepository;
 use App\Repositories\UserRepository;
 use App\Traits\ValidatorTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Closure;
+use Illuminate\Support\Facades\Mail;
 
 class SalesController extends Controller
 {
@@ -22,14 +25,15 @@ class SalesController extends Controller
 
     public function index(Request $request)
     {
+        $data = [];
         $sellerId = $request->get('seller_id');
-        return $this->sales->paginate($sellerId);
-    }
-
-    public function comissionList(Request $request)
-    {
-        $sellerId = $request->get('seller_id');
-        return $this->sales->comissionList($sellerId);
+        $date = $request->get('date') ? Carbon::createFromFormat('Y-m-d H:i:s', $request->get('date')) : now();
+        $paginate = (bool)$request->get('paginate', 1);
+        $paginateLimit = $request->get('limit', 15);
+        $sales = $this->sales->list(sellerId: $sellerId, date: $date, simplePaginate: $paginate, paginateLimit: $paginateLimit);
+        $data['list'] = $sales;
+        $data['commission'] = $this->sales->commission(sellerId: $sellerId, date: $date);
+        return $data;
     }
 
     public function create(): JsonResponse
@@ -52,6 +56,7 @@ class SalesController extends Controller
         }
 
         $validatorRules = [
+            'name' => 'required',
             'value' => [
                 'required',
                 'numeric',
@@ -75,11 +80,12 @@ class SalesController extends Controller
         }
 
         $sales = $this->sales->create([
+            'name' => $data['name'],
             'value' => $data['value'],
         ]);
         $sales->users()->attach($user);
 
-        return response()->json($sales);
+        return response()->json($sales, 201);
     }
 
     public function show(string $id): JsonResponse
@@ -100,5 +106,15 @@ class SalesController extends Controller
     public function destroy(string $id): JsonResponse
     {
         return response()->json([]);
+    }
+
+    public function test()
+    {
+        $data = [
+            'subject' => 'Comission Send Mail',
+            'test' => 'aaaaaaa',
+        ];
+        Mail::to('raphaellorencini@gmail.com')->send(new ComissionSendMail($data));
+        return response()->json(['message' => true]);
     }
 }

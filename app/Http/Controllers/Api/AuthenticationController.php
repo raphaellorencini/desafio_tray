@@ -13,11 +13,15 @@ class AuthenticationController extends Controller
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $user = User::find(Auth::user()->id);
+            $role = $user->roles->toArray()[0]['name'];
+
             $user_token['token'] = $user->createToken('appToken')->accessToken;
             if(isset($user_token['token'])) {
                 return response()->json([
                     'success' => true,
                     'token' => $user_token['token'],
+                    'id' => $user->id,
+                    'role' => $role,
                 ]);
             }
         }

@@ -23,17 +23,20 @@ Route::group(['namespace' => 'Api', 'prefix' => 'v1'], function () {
             return rand();
         })->middleware(['role:admin']);
         Route::get('users', [UsersController::class, 'index']);
+        Route::get('users/{id}', [UsersController::class, 'show']);
         Route::post('users', [UsersController::class, 'store']);
         Route::put('users/{id}', [UsersController::class, 'update']);
         Route::delete('users/{id}', [UsersController::class, 'destroy']);
 
         Route::get('sellers', [SellersController::class, 'index']);
+        Route::get('sellers/{id}', [SellersController::class, 'show']);
         Route::post('sellers', [SellersController::class, 'store']);
         Route::put('sellers/{id}', [SellersController::class, 'update']);
         Route::delete('sellers/{id}', [SellersController::class, 'destroy']);
 
         Route::get('sales', [SalesController::class, 'index']);
         Route::post('sales', [SalesController::class, 'store']);
+        Route::get('sales/test', [SalesController::class, 'test']);
 
 
     });

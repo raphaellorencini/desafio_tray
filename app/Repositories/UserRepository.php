@@ -19,7 +19,7 @@ class UserRepository extends BaseRepository
                 $query->where('name', $userRole);
             });
         })
-        ->simplePaginate($limit);
+        ->paginate($limit);
 
         $userList = $users->toArray();
         $userList['data'] = collect($users->items())->map(function($value) {

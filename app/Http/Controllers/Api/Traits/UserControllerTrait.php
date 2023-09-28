@@ -46,7 +46,14 @@ trait UserControllerTrait
 
     public function show(string $id)
     {
-        //
+        try {
+            return response()->json($this->users->getById($id));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => true,
+                'message' => '404 Not Found'
+            ], 404);
+        }
     }
 
     public function edit(Request $request, string $id): JsonResponse

@@ -21,7 +21,7 @@ class SaleSeeder extends Seeder
         User::factory()
             ->count(10)
             ->sequence(fn (Sequence $sequence) => [
-                'name' => 'Seller '.($sequence->index + 1),
+                'name' => 'Seller '. ($sequence->index + 1),
                 'email' => sprintf("seller%s@seller.com.br", $sequence->index + 1),
                 'password' => bcrypt('123456'),
             ])
@@ -29,6 +29,7 @@ class SaleSeeder extends Seeder
             ->hasAttached(Sale::factory()
                 ->count(5)
                 ->sequence(fn (Sequence $sequence) => [
+                    'name' => 'Product '. ($sequence->index + 1),
                     'value' => fake()->randomFloat(2, 5, 100)
                 ]))
             ->create();

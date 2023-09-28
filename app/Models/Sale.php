@@ -12,6 +12,7 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'seller_id',
         'value',
     ];
