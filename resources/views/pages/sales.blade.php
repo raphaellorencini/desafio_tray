@@ -22,7 +22,7 @@
                     <th>&nbsp;</th>
                     <th id="total_commission"></th>
                     <th>&nbsp;</th>
-                    <th>&nbsp;</th>
+                    <th id="button_total_commission"><button id="btn_total_commission" class="btn btn-info btn-sm commission-sale2" data-id="" data-toggle="modal" data-target="#confirmCommissionModal">Comissão Total</button></th>
                 </tr>
             </tfooter>
         </table>
@@ -79,12 +79,12 @@
                                         <td>${sale.commission}</td>
                                         <td>${sale.created_at}</td>
                                         <td>
-                                            <button class="btn btn-primary btn-sm commission-sale" data-id="${sale.id}" data-toggle="modal" data-target="#confirmCommissionModal">Comissão</button>
+                                            <button class="btn btn-primary btn-sm commission-sale" data-id="${sale.user_id}" data-toggle="modal" data-target="#confirmCommissionModal">Comissão</button>
                                         </td>
                                     </tr>
                                 `);
                             });
-                            $('#total_commission').html(response.commission)
+                            $('#total_commission').html(response.commission);
                             pagination.empty();
                             for (let i = 1; i <= response.list.last_page; i++) {
                                 pagination.append(`
@@ -110,28 +110,37 @@
 
                 saleList.on('click', '.commission-sale', function() {
                     saleIdToCommission = $(this).data('id');
+                    console.log(saleIdToCommission)
+                    $('#confirmCommissionModal').modal('show');
+                });
+
+                $('#btn_total_commission').click(function() {
+                    saleIdToCommission = $(this).data('id');
+                    console.log(saleIdToCommission)
                     $('#confirmCommissionModal').modal('show');
                 });
 
                 $('#confirmSend').click(function() {
+                    let url = '/api/v1/sales/commission';
                     if (saleIdToCommission) {
-                        /*$.ajax({
-                            type: 'GET',
-                            url: `/api/v1/sales/comission/${saleIdToCommission}`,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer {{$token}}',
-                            },
-                            success: function() {
-                                loadUsers();
-                                $('#confirmDeleteModal').modal('hide');
-                            },
-                            error: function(error) {
-                                console.error(error);
-                                $('#confirmDeleteModal').modal('hide');
-                            }
-                        });*/
+                        url = `/api/v1/sales/commission/${saleIdToCommission}`;
                     }
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer {{$token}}',
+                        },
+                        success: function() {
+                            loadUsers();
+                            $('#confirmCommissionModal').modal('hide');
+                        },
+                        error: function(error) {
+                            console.error(error);
+                            $('#confirmCommissionModal').modal('hide');
+                        }
+                    });
                 });
 
                 $('button.modal-close').click(function () {

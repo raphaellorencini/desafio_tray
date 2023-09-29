@@ -28,7 +28,7 @@
                     <a class="nav-link" href="{{ route('users') }}">Administradores</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('logout') }}">Usuário: {{$user_name}} (Logout)</a>
+                    <a class="nav-link" href="{{ route('logout2') }}">Usuário: {{$user_name}} (Logout)</a>
                 </li>
             </ul>
         </div>

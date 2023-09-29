@@ -9,12 +9,12 @@
                     <form id="loginForm">
                         <div class="form-group">
                             <label for="email">{{ __('E-Mail') }}</label>
-                            <input id="email" type="email" class="form-control" name="email" required autofocus value="admin@admin.com.br">
+                            <input id="email" type="email" class="form-control" name="email" required autofocus>
                             <span class="invalid-feedback" id="email-error"></span>
                         </div>
                         <div class="form-group">
                             <label for="password">{{ __('Senha') }}</label>
-                            <input id="password" type="password" class="form-control" name="password" required value="123456">
+                            <input id="password" type="password" class="form-control" name="password" required>
                             <span class="invalid-feedback" id="password-error"></span>
                         </div>
                         <div class="form-group mb-0">

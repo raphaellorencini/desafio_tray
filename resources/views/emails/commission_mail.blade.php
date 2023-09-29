@@ -6,20 +6,18 @@
     <title>{{ $data['subject'] }}</title>
 </head>
 <body>
+
 <table>
-    {{--<tr>
-        <td>
-            <img src="{{ asset('path-to-your-logo.png') }}" alt="Your Logo">
-        </td>
-    </tr>--}}
+    <tr>
+        <th>Comissão do dia - {{$data['date']}}</th>
+    </tr>
     <tr>
         <td>
-            {{$data['test']}}
-            {{--<h1>{{ $greeting }}</h1>
-            <p>{{ $intro }}</p>
-            <p>{{ $content }}</p>
-            <p>{{ $outro }}</p>
-            <p>{{ $signature }}</p>--}}
+            @if(isset($data['name']) && filled($data['name']))
+            <p><strong>Vendedor:</strong> {{$data['name']}}</p>
+            <p><strong>Email:</strong> {{$data['email']}}</p>
+            @endif
+            <p><strong>Comissão:</strong> {{$data['commission']}}</p>
         </td>
     </tr>
 </table>

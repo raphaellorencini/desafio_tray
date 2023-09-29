@@ -28,7 +28,7 @@ class ComissionSendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Comission - '.date('d/m/Y'),
+            subject: $this->data['subject']
         );
     }
 

@@ -23,7 +23,7 @@ class SalesController extends Controller
         protected UserRepository $user,
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $data = [];
         $sellerId = $request->get('seller_id');
@@ -33,12 +33,8 @@ class SalesController extends Controller
         $sales = $this->sales->list(sellerId: $sellerId, date: $date, simplePaginate: $paginate, paginateLimit: $paginateLimit);
         $data['list'] = $sales;
         $data['commission'] = $this->sales->commission(sellerId: $sellerId, date: $date);
-        return $data;
-    }
 
-    public function create(): JsonResponse
-    {
-        return response()->json([]);
+        return response()->json($data);
     }
 
     public function store(Request $request): JsonResponse
@@ -88,33 +84,33 @@ class SalesController extends Controller
         return response()->json($sales, 201);
     }
 
-    public function show(string $id): JsonResponse
+    public function commission(Request $request, $seller_id = null): JsonResponse
     {
-        return response()->json([]);
-    }
-
-    public function edit(string $id): JsonResponse
-    {
-        return response()->json([]);
-    }
-
-    public function update(Request $request, string $id): JsonResponse
-    {
-        return response()->json([]);
-    }
-
-    public function destroy(string $id): JsonResponse
-    {
-        return response()->json([]);
-    }
-
-    public function test()
-    {
+        $date = $request->get('date') ? Carbon::createFromFormat('Y-m-d H:i:s', $request->get('date')) : now();
+        $commission = $this->sales->commission(sellerId: $seller_id, date: $date);
+        $user = null;
+        if (filled($seller_id)) {
+            try {
+                $user = $this->user->getById($seller_id);
+            } catch (ModelNotFoundException $e) {
+                return response()->json([
+                    'error' => true,
+                    'message' => '404 Not Found'
+                ], 404);
+            }
+        }
+        $date = $date->format('d/m/Y');
         $data = [
-            'subject' => 'Comission Send Mail',
-            'test' => 'aaaaaaa',
+            'subject' => 'Comissão - Data: '.$date,
+            'name' => $user?->name,
+            'email' => $user?->email,
+            'commission' => number_format($commission, 2, ",", "."),
+            'date' => $date,
         ];
-        Mail::to('raphaellorencini@gmail.com')->send(new ComissionSendMail($data));
-        return response()->json(['message' => true]);
+
+        $to = $user?->email ?? env('MAIL_TO');
+        Mail::to($to)->send(new ComissionSendMail($data));
+
+        return response()->json(['commission' => $commission, 'mail' => true]);
     }
 }

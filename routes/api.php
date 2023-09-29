@@ -36,9 +36,7 @@ Route::group(['namespace' => 'Api', 'prefix' => 'v1'], function () {
 
         Route::get('sales', [SalesController::class, 'index']);
         Route::post('sales', [SalesController::class, 'store']);
-        Route::get('sales/test', [SalesController::class, 'test']);
-
-
+        Route::get('sales/commission/{seller_id?}', [SalesController::class, 'commission']);
     });
 
     Route::post('login', [AuthenticationController::class, 'login']);

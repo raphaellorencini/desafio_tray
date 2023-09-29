@@ -23,6 +23,6 @@ Route::get('/sellers', [IndexController::class, 'sellers'])->name('sellers');
 Route::get('/sales', [IndexController::class, 'sales'])->name('sales');
 Route::post('/redirect', [IndexController::class, 'redirect'])->name('redirect');
 
-Route::get('/logout', [IndexController::class, 'logout'])->name('logout');
+Route::get('/logout', [IndexController::class, 'logout'])->name('logout2');
 
 require __DIR__.'/auth.php';
