@@ -113,7 +113,7 @@ class SalesController extends Controller
             'date' => $date,
         ];
 
-        $to = 'raphaellorencini@gmail.com';//$user?->email ?? env('MAIL_TO');
+        $to = $user?->email ?? env('MAIL_TO');
         Mail::to($to)->send(new ComissionSendMail($data));
 
         return response()->json(['commission' => $commission, 'sales' => $sales, 'mail' => true]);
