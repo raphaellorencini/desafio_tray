@@ -88,10 +88,10 @@ class SaleTest extends TestCase
             ]);
 
         $saleRepository = new SaleRepository(new UserRepository());
-        $commission = floatval($saleRepository->commission());
+        $commission = $saleRepository->commission();
 
-        $this->assertIsFloat($commission);
-        $this->assertGreaterThanOrEqual(0.0, $commission);
-        $this->assertEquals(2.83, $commission);
+        $this->assertIsFloat(floatval($commission->commission));
+        $this->assertGreaterThanOrEqual(0.0, floatval($commission->commission));
+        $this->assertEquals(2.83, floatval($commission->commission));
     }
 }

@@ -18,8 +18,8 @@
             <tfooter>
                 <tr>
                     <th>Total</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
+                    <th id="total_sales"></th>
+                    <th>Total Comissões</th>
                     <th id="total_commission"></th>
                     <th>&nbsp;</th>
                     <th id="button_total_commission"><button id="btn_total_commission" class="btn btn-info btn-sm commission-sale2" data-id="" data-toggle="modal" data-target="#confirmCommissionModal">Comissão Total</button></th>
@@ -85,6 +85,7 @@
                                 `);
                             });
                             $('#total_commission').html(response.commission);
+                            $('#total_sales').html(response.sales);
                             pagination.empty();
                             for (let i = 1; i <= response.list.last_page; i++) {
                                 pagination.append(`

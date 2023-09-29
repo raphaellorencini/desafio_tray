@@ -38,7 +38,7 @@ class SaleRepository extends BaseRepository
     public function commission($sellerId = null, $date = null)
     {
         return DB::table('sales as s')
-            ->selectRaw('SUM(ROUND(s.value * 0.085, 2)) as commission')
+            ->selectRaw('SUM(ROUND(s.value * 0.085, 2)) as commission, SUM(ROUND(s.value, 2)) as sales')
             ->when(filled($sellerId) && is_numeric($sellerId), function (Builder $query) use ($sellerId) {
                 $query->leftJoin('users_sales as us', 'us.sale_id', '=', 's.id')
                     ->leftJoin('users as u', 'u.id', '=', 'us.user_id')
@@ -48,6 +48,6 @@ class SaleRepository extends BaseRepository
                 $dt = Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
                 $query->whereBetween('s.created_at', ["{$dt} 00:00:00", "{$dt} 23:59:59"]);
             })
-        ->first()?->commission ?? 0;
+        ->first();
     }
 }

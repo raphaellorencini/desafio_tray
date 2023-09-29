@@ -17,7 +17,8 @@
             <p><strong>Vendedor:</strong> {{$data['name']}}</p>
             <p><strong>Email:</strong> {{$data['email']}}</p>
             @endif
-            <p><strong>Comissão:</strong> {{$data['commission']}}</p>
+            <p><strong>Total Comissão:</strong> {{$data['commission']}}</p>
+            <p><strong>Total Vendas:</strong> {{$data['sales']}}</p>
         </td>
     </tr>
 </table>

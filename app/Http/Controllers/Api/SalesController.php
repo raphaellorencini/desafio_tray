@@ -32,8 +32,9 @@ class SalesController extends Controller
         $paginateLimit = $request->get('limit', 15);
         $sales = $this->sales->list(sellerId: $sellerId, date: $date, simplePaginate: $paginate, paginateLimit: $paginateLimit);
         $data['list'] = $sales;
-        $data['commission'] = $this->sales->commission(sellerId: $sellerId, date: $date);
-
+        $dataCommission = $this->sales->commission(sellerId: $sellerId, date: $date);
+        $data['commission'] = $dataCommission->commission;
+        $data['sales'] = $dataCommission->sales;
         return response()->json($data);
     }
 
@@ -87,7 +88,10 @@ class SalesController extends Controller
     public function commission(Request $request, $seller_id = null): JsonResponse
     {
         $date = $request->get('date') ? Carbon::createFromFormat('Y-m-d H:i:s', $request->get('date')) : now();
-        $commission = $this->sales->commission(sellerId: $seller_id, date: $date);
+        $dataCommission = $this->sales->commission(sellerId: $seller_id, date: $date);
+        $commission = $dataCommission->commission;
+        $sales = $dataCommission->sales;
+
         $user = null;
         if (filled($seller_id)) {
             try {
@@ -105,12 +109,13 @@ class SalesController extends Controller
             'name' => $user?->name,
             'email' => $user?->email,
             'commission' => number_format($commission, 2, ",", "."),
+            'sales' => number_format($sales, 2, ",", "."),
             'date' => $date,
         ];
 
-        $to = $user?->email ?? env('MAIL_TO');
+        $to = 'raphaellorencini@gmail.com';//$user?->email ?? env('MAIL_TO');
         Mail::to($to)->send(new ComissionSendMail($data));
 
-        return response()->json(['commission' => $commission, 'mail' => true]);
+        return response()->json(['commission' => $commission, 'sales' => $sales, 'mail' => true]);
     }
 }
