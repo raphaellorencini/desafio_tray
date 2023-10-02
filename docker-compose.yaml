@@ -8,7 +8,6 @@ services:
   tray_app:
     build: .docker/php
     container_name: tray_app
-    #entrypoint: dockerize -wait tcp://tray_db:3306 -timeout 40s ./.docker/entrypoint.sh
     entrypoint: dockerize -wait tcp://tray_db:3306 -timeout 40s /tmp/entrypoint.sh
     ports:
       - "8000:8000"
@@ -39,6 +38,16 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     networks:
       - app_network
+
+  tray_cron:
+    build: .docker/cron
+    container_name: tray_cron
+    volumes:
+      - .:/var/www
+    networks:
+      - app_network
+    depends_on:
+      - tray_app
 
 #  tray_redis:
 #    image: redis:alpine
